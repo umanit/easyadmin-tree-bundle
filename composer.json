@@ -1,0 +1,38 @@
+{
+  "name": "umanit/easyadmin-tree-bundle",
+  "description": "Plugin for EasyAdmin to add category tree features.",
+  "type": "symfony-bundle",
+  "keywords": [
+    "symfony",
+    "easyadmin",
+    "tree"
+  ],
+  "homepage": "https://github.com/umanit/easyadmin-tree-bundle",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "UmanIT",
+      "email": "contact@umanit.fr"
+    }
+  ],
+  "require": {
+    "php": "^8.0",
+    "doctrine/dbal": "^3.4",
+    "doctrine/doctrine-bundle": "^2.7",
+    "doctrine/orm": "^2.13",
+    "easycorp/easyadmin-bundle": "^4.4",
+    "gedmo/doctrine-extensions": "^3.9",
+    "symfony/config": "^5.4",
+    "symfony/dependency-injection": "^5.4",
+    "symfony/doctrine-bridge": "^5.4",
+    "symfony/form": "^5.4",
+    "symfony/options-resolver": "^5.4",
+    "symfony/translation": "^5.4"
+  },
+  "minimum-stability": "stable",
+  "autoload": {
+    "psr-4": {
+      "Umanit\\EasyAdminTreeBundle\\": ""
+    }
+  }
+}
