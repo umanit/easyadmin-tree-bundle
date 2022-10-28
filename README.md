@@ -176,3 +176,11 @@ Tree sidebar
 
 TreeField in forms
 ![screenshot3](doc/screenshots/3.jpg "TreeField on forms")
+
+### TODO 
+
+List of needed improvements : 
+- fold/unfold categories
+- reorder category items with drag'n drop
+- prefill category in TreeField with current category in the sidebar
+- improve front (design, css)
