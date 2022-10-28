@@ -1,0 +1,9 @@
+{% extends '@EasyAdmin/crud/index.html.twig' %}
+
+{% block body_class 'umanit-easy-admin-tree ' ~ parent() %}
+
+{% block content %}
+  {{ categorization_sidebar(context, current_category) | raw }}
+
+  {{ parent() }}
+{% endblock %}

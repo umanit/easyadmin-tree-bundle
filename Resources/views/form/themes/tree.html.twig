@@ -1,0 +1,33 @@
+{% block tree_field_widget %}
+    <ul class="umanit_easyadmintree_tree_field umanit_easyadmintree_tree_field-container col-md-6 col-xxl-5">
+        {% set previous_level = 0 %}
+        {%- for child in form %}
+            {% set level = child.vars.attr['data-level'] is defined ? child.vars.attr['data-level'] : 0 %}
+
+            {% if level < previous_level %}
+                {% for i in level..(previous_level-1) %}
+                    </ul>
+                {% endfor %}
+            {% endif %}
+
+            <li>
+                <div class="umanit_easyadmintree_tree_field-item {% if child.vars.checked %}umanit_easyadmintree_tree_field-item--active{% endif %}">
+                    <input type="radio" id="{{ child.vars.id }}" name="{{ child.vars.full_name }}" class="form-check-input" value="{% if child.vars.value is defined %}{{ child.vars.value }}{% endif %}" {% if child.vars.checked %} checked="checked"{% endif %} />
+                    <label class="form-check-label umanit_easyadmintree_tree_field-item-label" for="{{ child.vars.id }}">
+                        {% if loop.first %}
+                            {{ 'umanit.easyadmin.tree.form-field.placeholder' | trans }}
+                        {% else %}
+                            {{ child.vars.label }}
+                        {% endif %}
+                    </label>
+                </div>
+            {% if child.vars.attr['data-has-child'] is defined and child.vars.attr['data-has-child'] == true %}
+                <ul class="umanit_easyadmintree_tree_field">
+            {% else %}
+                </li>
+            {% endif %}
+
+            {% set previous_level = level %}
+        {% endfor -%}
+    </ul>
+{% endblock %}

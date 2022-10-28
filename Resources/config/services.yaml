@@ -1,0 +1,26 @@
+services:
+    Umanit\EasyAdminTreeBundle\Factory\TreeMenuFactory:
+        autowire: true
+    Umanit\EasyAdminTreeBundle\Field\Configurator\TreeConfigurator:
+        autowire: true
+        tags:
+            - 'ea.field_configurator'
+
+    Umanit\EasyAdminTreeBundle\Form\Type\TreeFieldType:
+        autowire: true
+
+    Umanit\EasyAdminTreeBundle\Twig\TreeExtension:
+        autowire: true
+        public: false
+        tags:
+            - { name: twig.extension }
+
+    Umanit\EasyAdminTreeBundle\Twig\TreeRuntime:
+        autowire: true
+        tags:
+            - { name: twig.runtime }
+
+    # priority set to 5 to be sure that the listener is executed before "stof_doctrine_extensions.listener.tree"
+    Umanit\EasyAdminTreeBundle\Listener\MappingListener:
+        tags:
+            - { name: doctrine.event_listener, event: loadClassMetadata, priority: 5 }
