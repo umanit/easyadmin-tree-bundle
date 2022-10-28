@@ -1,6 +1,6 @@
 {
   "name": "umanit/easyadmin-tree-bundle",
-  "description": "Plugin for EasyAdmin to add category tree features.",
+  "description": "Plugin to add category tree features for EasyAdmin",
   "type": "symfony-bundle",
   "keywords": [
     "symfony",
