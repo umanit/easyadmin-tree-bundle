@@ -168,7 +168,11 @@ class MediaCrudController extends AbstractCategorizedCrudController
 ```
 
 ### Screenshots
-
+Tree structure on index page
 ![screenshot1](doc/screenshots/1.jpg "Content's entries as a tree structure")
+
+Tree sidebar
 ![screenshot2](doc/screenshots/2.jpg "Tree sidebar")
+
+TreeField in forms
 ![screenshot3](doc/screenshots/3.jpg "TreeField on forms")
