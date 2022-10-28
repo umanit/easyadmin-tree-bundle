@@ -1,6 +1,4 @@
 services:
-    Umanit\EasyAdminTreeBundle\Factory\TreeMenuFactory:
-        autowire: true
     Umanit\EasyAdminTreeBundle\Field\Configurator\TreeConfigurator:
         autowire: true
         tags:
