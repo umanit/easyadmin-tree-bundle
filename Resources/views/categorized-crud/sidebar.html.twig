@@ -1,28 +1,28 @@
 {% macro recursiveCategory(category, url, category_url_param_name, current_category) %}
-    {% import _self as self %}
-    <li>
-        <span class="categorization-sidebar-category-label {% if category.id == current_category %}active{% endif %}">
-            <a href="{{ url ~ '&' ~ category_url_param_name ~ '=' ~ category.id }}" class="submenu-toggle">
-                <i class="categorization-sidebar-icon fas fa-light fa-folder"></i>
-                {{ category.name }}
-            </a>
-        </span>
-        {% if category.__children|length %}
-            <ul class="categorization-sidebar-categories">
-                {% for child in category.__children %}
-                    {{ self.recursiveCategory(child, url, category_url_param_name, current_category) }}
-                {% endfor %}
-            </ul>
-        {% endif %}
-    </li>
+  {% import _self as self %}
+  <li>
+    <span class="categorization-sidebar-category-label {% if category.id == current_category %}active{% endif %}">
+      <a href="{{ url ~ '&' ~ category_url_param_name ~ '=' ~ category.id }}" class="submenu-toggle">
+        <i class="categorization-sidebar-icon fas fa-light fa-folder"></i>
+        {{ category.name }}
+      </a>
+    </span>
+    {% if category.__children|length %}
+      <ul class="categorization-sidebar-categories">
+        {% for child in category.__children %}
+          {{ self.recursiveCategory(child, url, category_url_param_name, current_category) }}
+        {% endfor %}
+      </ul>
+    {% endif %}
+  </li>
 {% endmacro %}
 
 {% from _self import recursiveCategory %}
 
 <aside id="categorization-sidebar">
-    <ul class="categorization-sidebar-categories">
-        {% for category in categories %}
-            {{ recursiveCategory(category, url, category_url_param_name, current_category) }}
-        {% endfor %}
-    </ul>
+  <ul class="categorization-sidebar-categories">
+    {% for category in categories %}
+      {{ recursiveCategory(category, url, category_url_param_name, current_category) }}
+    {% endfor %}
+  </ul>
 </aside>
