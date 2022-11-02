@@ -31,7 +31,7 @@ abstract class AbstractCategorizedCrudController extends AbstractCrudController
 
     abstract protected static function getCategoryPropertyName(): string;
 
-    abstract protected function getDefaultCategoryId();
+    abstract protected function getDefaultCategoryId(): int;
 
     protected function getCategoryRepository(): ObjectRepository
     {
@@ -42,7 +42,7 @@ abstract class AbstractCategorizedCrudController extends AbstractCrudController
     {
         $qb = parent::createIndexQueryBuilder($searchDto, $entityDto, $fields, $filters);
 
-        // On récupère une liste d'identifiant de la catégorie en cours + ceux des catégories enfants
+        // Fetch a list of ids of current category + ones for children categories
         $currentCategoryId = $this->getCurrentCategoryId();
         $currentCategory = $this->getCategoryRepository()->find($currentCategoryId);
         $categories = $this
@@ -53,7 +53,7 @@ abstract class AbstractCategorizedCrudController extends AbstractCrudController
             ->getResult(Query::HYDRATE_SCALAR_COLUMN)
         ;
 
-        // On applique la catégorie seulement s'il n'y a pas de recherche ou de filtre en cours
+        // Apply category filter only if there is no search or other filter activated
         if ('' === $searchDto->getQuery() && empty($filters->all())) {
             $qb
                 ->andWhere('entity.'.$this->getCategoryPropertyName().' in (:categories)')
