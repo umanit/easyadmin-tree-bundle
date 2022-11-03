@@ -14,12 +14,37 @@ Plugin to add category tree features for EasyAdmin
 
 ## Configuration
 
-The template needs to be declared in your Twig configuration :
+The templates paths needs to be declared in your Twig configuration :
 
 ```yaml
 twig:
   paths:
     '%kernel.project_dir%/vendor/umanit/easyadmin-tree-bundle/Resources/views': UmanitEasyAdminTreeBundle
+```
+
+This bundle relies on StofDoctrineExtensionsBundle, so make sure it is configured properly : [documentation](https://symfony.com/bundles/StofDoctrineExtensionsBundle/current/index.html). 
+You need to :
+* add tree extension to your mapping : 
+```yaml
+doctrine:
+    orm:
+        entity_managers:
+            default:
+                mappings:
+                    gedmo_tree:
+                        type: annotation
+                        prefix: Gedmo\Tree\Entity
+                        dir: "%kernel.project_dir%/vendor/gedmo/doctrine-extensions/src/Tree/Entity"
+                        alias: GedmoTree # (optional) it will default to the name set for the mapping
+                        is_bundle: false
+```
+* activate the tree extension :
+```yaml
+stof_doctrine_extensions:
+    default_locale: en_US
+    orm:
+        default:
+            tree: true
 ```
 
 ## Usage
