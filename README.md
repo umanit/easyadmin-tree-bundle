@@ -209,3 +209,4 @@ List of needed improvements :
 - reorder category items with drag'n drop
 - prefill category in TreeField with current category in the sidebar
 - improve front (design, css)
+- deal with ManyToMany relations (allow multiple selection on TreeField)
