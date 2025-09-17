@@ -33,17 +33,33 @@ class TreeRuntime implements RuntimeExtensionInterface
         $categoryFqcn = $crudControllerFqcn::getCategoryFqcn();
         $categoryRepository = $this->registry->getRepository($categoryFqcn);
         $categories = $categoryRepository->childrenHierarchy();
+
+        return $this->twig->render('@UmanitEasyAdminTreeBundle/categorized-crud/sidebar.html.twig', [
+            'categories' => $categories,
+            'url' => $this->getCategoryListUrl($crudControllerFqcn),
+            'category_url_param_name' => $crudControllerFqcn::CATEGORY_URL_PARAM_NAME,
+            'current_category' => $currentCategoryId,
+        ]);
+    }
+
+    private function getCategoryListUrl(string $crudControllerFqcn): string
+    {
         $url = $this->urlGenerator
             ->setController($crudControllerFqcn)
             ->setAction(Action::INDEX)
             ->generateUrl()
         ;
+        $parsed = parse_url($url);
+        $query = $parsed['query'];
+        parse_str($query, $params);
+        unset($params['umanit_category']);
+        $string = http_build_query($params);
+        $url = strtok($url, '?');
 
-        return $this->twig->render('@UmanitEasyAdminTreeBundle/categorized-crud/sidebar.html.twig', [
-            'categories'              => $categories,
-            'url'                     => $url,
-            'category_url_param_name' => $crudControllerFqcn::CATEGORY_URL_PARAM_NAME,
-            'current_category'        => $currentCategoryId,
-        ]);
+        if ('' !== $string) {
+            $url .= '?' . $string;
+        }
+
+        return $url;
     }
 }

@@ -2,7 +2,8 @@
   {% import _self as self %}
   <li>
     <span class="categorization-sidebar-category-label {% if category.id == current_category %}active{% endif %}">
-      <a href="{{ url ~ '&' ~ category_url_param_name ~ '=' ~ category.id }}" class="submenu-toggle">
+      <a href="{{ url ~ ('?' in url ? '&' : '?') ~ category_url_param_name ~ '=' ~ category.id }}"
+         class="submenu-toggle">
         <i class="categorization-sidebar-icon fas fa-light fa-folder"></i>
         {{ category.name }}
       </a>
