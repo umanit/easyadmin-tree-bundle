@@ -50,7 +50,7 @@ class TreeRuntime implements RuntimeExtensionInterface
             ->generateUrl()
         ;
         $parsed = parse_url($url);
-        $query = $parsed['query'];
+        $query = $parsed['query'] ?? '';
         parse_str($query, $params);
         unset($params['umanit_category']);
         $string = http_build_query($params);
