@@ -2,8 +2,11 @@
 
 namespace Umanit\EasyAdminTreeBundle\Controller;
 
+use Doctrine\ORM\Query;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use EasyCorp\Bundle\EasyAdminBundle\Collection\FieldCollection;
+use EasyCorp\Bundle\EasyAdminBundle\Collection\FilterCollection;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Assets;
@@ -11,13 +14,19 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
+use EasyCorp\Bundle\EasyAdminBundle\Dto\EntityDto;
+use EasyCorp\Bundle\EasyAdminBundle\Dto\SearchDto;
 use EasyCorp\Bundle\EasyAdminBundle\Event\AfterCrudActionEvent;
 use EasyCorp\Bundle\EasyAdminBundle\Event\BeforeCrudActionEvent;
 use EasyCorp\Bundle\EasyAdminBundle\Exception\ForbiddenActionException;
+use EasyCorp\Bundle\EasyAdminBundle\Factory\ActionFactory;
 use EasyCorp\Bundle\EasyAdminBundle\Factory\EntityFactory;
+use EasyCorp\Bundle\EasyAdminBundle\Factory\FieldFactory;
 use EasyCorp\Bundle\EasyAdminBundle\Factory\FilterFactory;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Security\Permission;
+use Gedmo\Tree\Entity\Repository\NestedTreeRepository;
+use LogicException;
 
 abstract class TreeCrudController extends AbstractCrudController
 {
@@ -29,7 +38,20 @@ abstract class TreeCrudController extends AbstractCrudController
         $this->doctrine = $doctrine;
     }
 
-    public function index(AdminContext $context)
+	public function createIndexQueryBuilder(SearchDto        $searchDto, EntityDto $entityDto, FieldCollection $fields,
+											FilterCollection $filters): QueryBuilder {
+		/** @var NestedTreeRepository $repository */
+		$repository = $this->doctrine->getRepository($entityDto->getFqcn());
+
+		$queryBuilder = $repository
+			->createQueryBuilder('entity')
+			->orderBy('entity.root, entity.lft', 'ASC');
+
+		return $queryBuilder;
+	}
+
+
+	public function index(AdminContext $context)
     {
         $event = new BeforeCrudActionEvent($context);
         $this->container->get('event_dispatcher')->dispatch($event);
@@ -46,19 +68,17 @@ abstract class TreeCrudController extends AbstractCrudController
         $context->getCrud()->setFieldAssets($this->getFieldAssets($fields));
         $filters = $this->container->get(FilterFactory::class)->create($context->getCrud()->getFiltersConfig(), $fields, $context->getEntity());
 
-        $repository = $this->doctrine->getRepository($context->getEntity()->getFqcn());
-
-        $queryBuilder = $repository
-            ->createQueryBuilder('entity')
-            ->orderBy('entity.root, entity.lft', 'ASC')
-        ;
+		$queryBuilder = $this->createIndexQueryBuilder($context->getSearch(), $context->getEntity(), $fields, $filters);
 
         $this->doctrine->getManager()->getConfiguration()->addCustomHydrationMode('tree', 'Gedmo\Tree\Hydrator\ORM\TreeObjectHydrator');
-        $entities = $queryBuilder->getQuery()->getResult();
+		$query = $queryBuilder->getQuery()->setHint(Query::HINT_INCLUDE_META_COLUMNS, true);
+		$query->getResult("tree");
+		$entities = $query->getResult();
         $entities = $this->container->get(EntityFactory::class)->createCollection($context->getEntity(), $entities);
 
-        $this->container->get(EntityFactory::class)->processFieldsForAll($entities, $fields);
-        $actions = $this->container->get(EntityFactory::class)->processActionsForAll($entities, $context->getCrud()->getActionsConfig());
+
+		$this->container->get(FieldFactory::class)->processFieldsForAll($entities, $fields);
+		$actions = $this->container->get(ActionFactory::class)->processGlobalActionsAndEntityActionsForAll($entities, $context->getCrud()->getActionsConfig());
 
         $responseParameters = $this->configureResponseParameters(KeyValueStore::new([
             'pageName'       => Crud::PAGE_INDEX,
@@ -100,7 +120,7 @@ abstract class TreeCrudController extends AbstractCrudController
 
     public static function getEntityFqcn(): string
     {
-        throw new \LogicException('Override this method in child class');
+        throw new LogicException('Override this method in child class');
     }
 
     public function configureAssets(Assets $assets): Assets

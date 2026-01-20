@@ -10,15 +10,6 @@ use Gedmo\Mapping\Annotation as Gedmo;
 #[ORM\MappedSuperclass]
 abstract class AbstractTreeItem
 {
-
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
-    protected int $id;
-
-    #[ORM\Column(length: 255)]
-    protected string $name;
-
     #[Gedmo\TreeLeft]
     #[ORM\Column(name: 'lft', type: Types::INTEGER)]
     protected $lft;
@@ -42,29 +33,22 @@ abstract class AbstractTreeItem
     #[ORM\OrderBy(['lft' => 'ASC'])]
     protected $children;
 
-    public function getId(): int
-    {
-        return $this->id;
-    }
+	abstract public function getId();
 
-    public function getName(): string
-    {
-        return $this->name;
-    }
+	abstract public function getName(): string;
 
-    public function setName(string $name): void
-    {
-        $this->name = $name;
-    }
+    abstract public function setName(string $name): static;
 
-    public function getRoot(): ?self
+	public function getRoot(): ?static
     {
         return $this->root;
     }
 
-    public function setParent(self $parent = null): void
+	public function setParent(self $parent = null): static
     {
         $this->parent = $parent;
+
+		return $this;
     }
 
     public function getParent(): ?self
@@ -77,9 +61,11 @@ abstract class AbstractTreeItem
         return $this->children;
     }
 
-    public function setChildren($children): void
+	public function setChildren($children): static
     {
         $this->children = $children;
+
+		return $this;
     }
 
     public function getLevel()

@@ -32,7 +32,7 @@ doctrine:
             default:
                 mappings:
                     gedmo_tree:
-                        type: annotation
+                        type: attribute
                         prefix: Gedmo\Tree\Entity
                         dir: "%kernel.project_dir%/vendor/gedmo/doctrine-extensions/src/Tree/Entity"
                         alias: GedmoTree # (optional) it will default to the name set for the mapping
