@@ -14,7 +14,9 @@ use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Event\AfterCrudActionEvent;
 use EasyCorp\Bundle\EasyAdminBundle\Event\BeforeCrudActionEvent;
 use EasyCorp\Bundle\EasyAdminBundle\Exception\ForbiddenActionException;
+use EasyCorp\Bundle\EasyAdminBundle\Factory\ActionFactory;
 use EasyCorp\Bundle\EasyAdminBundle\Factory\EntityFactory;
+use EasyCorp\Bundle\EasyAdminBundle\Factory\FieldFactory;
 use EasyCorp\Bundle\EasyAdminBundle\Factory\FilterFactory;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Security\Permission;
@@ -38,12 +40,11 @@ abstract class TreeCrudController extends AbstractCrudController
             return $event->getResponse();
         }
 
-        if (!$this->isGranted(Permission::EA_EXECUTE_ACTION, ['action' => Action::INDEX, 'entity' => null])) {
+        if (!$this->isGranted(Permission::EA_EXECUTE_ACTION, ['action' => Action::INDEX, 'entity' => null, 'entityFqcn' => $context->getEntity()->getFqcn()])) {
             throw new ForbiddenActionException($context);
         }
 
         $fields = FieldCollection::new($this->configureFields(Crud::PAGE_INDEX));
-        $context->getCrud()->setFieldAssets($this->getFieldAssets($fields));
         $filters = $this->container->get(FilterFactory::class)->create($context->getCrud()->getFiltersConfig(), $fields, $context->getEntity());
 
         $repository = $this->doctrine->getRepository($context->getEntity()->getFqcn());
@@ -57,9 +58,10 @@ abstract class TreeCrudController extends AbstractCrudController
         $entities = $queryBuilder->getQuery()->getResult();
         $entities = $this->container->get(EntityFactory::class)->createCollection($context->getEntity(), $entities);
 
-        $this->container->get(EntityFactory::class)->processFieldsForAll($entities, $fields);
-        $actions = $this->container->get(EntityFactory::class)->processActionsForAll($entities, $context->getCrud()->getActionsConfig());
-
+        $this->container->get(FieldFactory::class)->processFieldsForAll($entities, $fields, Crud::PAGE_INDEX);
+        $processedFields = $entities->first()?->getFields() ?? new FieldCollection([]);
+        $context->getCrud()->setFieldAssets($this->getFieldAssets($processedFields));
+        $actions = $this->container->get(ActionFactory::class)->processGlobalActionsAndEntityActionsForAll($entities, $context->getCrud()->getActionsConfig());
         $responseParameters = $this->configureResponseParameters(KeyValueStore::new([
             'pageName'       => Crud::PAGE_INDEX,
             'templateName'   => 'crud/index',

@@ -20,7 +20,7 @@
     "doctrine/dbal": "^3.4",
     "doctrine/doctrine-bundle": "^2.7",
     "doctrine/orm": "^2.13",
-    "easycorp/easyadmin-bundle": "^4.4",
+    "easycorp/easyadmin-bundle": "^4.29",
     "gedmo/doctrine-extensions": "^3.9",
     "stof/doctrine-extensions-bundle": "^1.7",
     "symfony/config": "^5.4|^6.0",
