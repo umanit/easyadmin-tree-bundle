@@ -192,6 +192,30 @@ class MediaCrudController extends AbstractCategorizedCrudController
     }
 ```
 
+If you wish to use the tree field with a ManyToMany relation, just set field attribute `multiple` to true :
+```php
+<?php
+// src/Controller/Admin/MediaCrudController.php
+namespace App\Controller\Admin;
+
+use Umanit\EasyAdminTreeBundle\Field\TreeField;
+
+class MediaCrudController extends AbstractCategorizedCrudController
+{
+
+    public function configureFields(string $pageName): iterable
+    {
+        return [
+            // ...
+            $pageName === 'index'
+                ? AssociationField::new('categories', 'My categories')
+                : TreeField::new('categories', 'My categories')
+                    ->setFormTypeOption('multiple', true),
+            // ...
+        ];
+    }
+```
+
 ### Screenshots
 Tree structure on index page
 ![screenshot1](doc/screenshots/1.jpg "Content's entries as a tree structure")
